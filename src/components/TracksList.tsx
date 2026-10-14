@@ -1,13 +1,14 @@
 import { useEffect, useState } from "react";
 import TrackItem from './TrackItem';
+import type { TrackListItemOutput } from './TrackItem'
 
-export function TracksList(props) {
-    const {
-        onTrackSelect,
-        selectedTrackId
-    } = props
+type Props = {
+    selectedTrackId: string | null
+    onTrackSelect: (id: string | null) => void
+}
 
-    const [tracks, setTracks] = useState(null);
+export function TracksList({ onTrackSelect, selectedTrackId }: Props) {
+    const [tracks, setTracks] = useState< Array<TrackListItemOutput> | null >(null);
 
     useEffect(() => {
         fetch('https://musicfun.it-incubator.app/api/1.0/playlists/tracks',
@@ -41,24 +42,24 @@ export function TracksList(props) {
     }
 
     const handleResetClick = () => {
-        props.onTrackSelect?.(null);
+        onTrackSelect?.(null);
+    }
+
+    const handleClick = (trackId: string) => {
+        onTrackSelect?.(trackId);
     }
 
     return <div>
         <button onClick={handleResetClick}>reset</button>
+        <hr />
         <ul>
             {
                 tracks?.map((track) => {
-                    const handleClick = (trackId) => {
-                        onTrackSelect?.(trackId);
-                    }
-
                     return <TrackItem key={track.id}
-                                      track={track}
-                                      isSelected={track.id === selectedTrackId}
-                                      selectedTrackId={selectedTrackId}
-                                      onSelect={handleClick}
-                            />
+                        track={track}
+                        isSelected={track.id === selectedTrackId}
+                        onSelect={handleClick}
+                    />
                 })
             }
         </ul >
